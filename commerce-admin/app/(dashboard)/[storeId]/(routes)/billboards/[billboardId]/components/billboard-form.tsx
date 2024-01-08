@@ -23,8 +23,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { AlertModal } from '@/components/modals/alert-modal';
-import { ApiAlert } from '@/components/ui/api-alert';
-import { useOrigin } from '@/hooks/use-origin';
 import ImageUpload from '@/components/ui/image-upload';
 
 
@@ -42,7 +40,6 @@ type BillboardFormValues = z.infer<typeof formSchema>;
 export const BillboardForm: React.FC<BillboardFormProps> = ({
     initialData
 }) => {
-    const origin = useOrigin();
     const params = useParams();
     const router = useRouter();
 
@@ -85,7 +82,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
             setLoading(true);
             await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
             router.refresh();
-            router.push('/');
+            router.push(`/${params.storeId}/billboards`);
             toast.success('Billboard deleted');
         } catch (error) {
             toast.error('Make sure all categories using this billboard are removed first')
