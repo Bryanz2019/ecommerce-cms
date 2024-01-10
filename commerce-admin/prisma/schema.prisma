@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Store {
-  id        String      @id @default(uuid())  @map("_id") @db.ObjectId
+  id        String      @id @default(auto())  @map("_id") @db.ObjectId
   name      String
   userId    String
   billboard Billboard[] @relation("StoreToBillboard")
@@ -20,7 +20,7 @@ model Store {
 }
 
 model Billboard {
-  id        String      @id @default(uuid()) @map("_id") @db.ObjectId
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
   storeId   String      @db.ObjectId
   store     Store       @relation("StoreToBillboard", fields: [storeId], references: [id])
   label     String
