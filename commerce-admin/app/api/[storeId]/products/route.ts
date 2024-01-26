@@ -12,7 +12,6 @@ export async function POST(
 
         const {
             name,
-            price,
             quantity,
             categoryId,
             colorId,
@@ -21,6 +20,9 @@ export async function POST(
             isFeatured,
             isArchived
         } = body;
+
+        var { price } = body;
+        price = ""+price;
 
         if (!userId) {
             return new NextResponse("Unauthenticated", { status: 401 });
