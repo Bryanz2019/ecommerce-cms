@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import { Product } from "@/types";
 
@@ -15,6 +15,8 @@ const useCart = create(
     persist<CartStore>((set, get) => ({
         items: [],
         addItem: (data: Product) => {
+            if( data == null ) return;
+            toast.success("id: "+data.id);
             const currentItems = get().items;
             const existingItem = currentItems.find((item) => item.id === data.id);
 

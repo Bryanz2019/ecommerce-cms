@@ -37,7 +37,7 @@ const OrdersPage = async ({
     }, 0)),
     isPaid: item.isPaid,
     createdAt: format(item.createdAt, "MMMM do, yyyy")
-  }))
+  }));
 
   return (
     <div className="flex-col">

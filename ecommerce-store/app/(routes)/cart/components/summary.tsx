@@ -30,8 +30,10 @@ const Summary = () => {
     }, 0)
 
     const onCheckout = async() => {
+        toast.success("Number of items: "+items.filter((item) => item.id != null).length);
+        
         const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
-            products: items.map((item) => {item.id, item.quantity})
+            products: items.filter((item) => item.id != null).map((item) => ({id: item.id, quantity: item.quantity}))
         });
 
         window.location = response.data.url;
@@ -50,7 +52,7 @@ const Summary = () => {
                     <Currency value={totalPrice} />
                 </div>
             </div>
-            <Button onClick={onCheckout} className="w-full mt-6">
+            <Button disabled={items.length === 0} onClick={onCheckout} className="w-full mt-6">
                 Checkout
             </Button>
         </div>
