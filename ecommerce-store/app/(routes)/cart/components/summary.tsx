@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect } from "react";
+import { FormEventHandler, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
@@ -12,6 +12,8 @@ import useCart from "@/hooks/use-cart";
 const Summary = () => {
     const searchParams = useSearchParams();
     const items = useCart((state) => state.items);
+    const discount = useCart((state) => state.discount);
+    const addDiscount = useCart((state) => state.addDiscount);
     const removeAll = useCart((state) => state.removeAll);
 
     useEffect(() => {
@@ -27,13 +29,22 @@ const Summary = () => {
 
     const totalPrice = items.reduce((total, item) => {
         return total + item.quantity * Number(item.price);
-    }, 0)
+    }, 0);
+
+    const onUseCode: FormEventHandler<HTMLFormElement> = (event) => {
+        event.stopPropagation();
+        const value = event.currentTarget.elements.namedItem("discountCode") as HTMLInputElement;
+        addDiscount( String(value.value) );
+        toast.success("Discount Code Applied");
+        event.preventDefault();
+    }
 
     const onCheckout = async() => {
         toast.success("Number of items: "+items.filter((item) => item.id != null).length);
         
         const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
-            products: items.filter((item) => item.id != null).map((item) => ({id: item.id, quantity: item.quantity}))
+            products: items.filter((item) => item.id != null).map((item) => ({id: item.id, quantity: item.quantity})),
+            discount: discount
         });
 
         window.location = response.data.url;
@@ -51,6 +62,19 @@ const Summary = () => {
                     </div>
                     <Currency value={totalPrice} />
                 </div>
+            </div>
+            <div className="mt-6 space-y-4">
+                <form onSubmit={onUseCode}>
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                        <div className="text-base font-medium text-gray-900">
+                            Discount Code
+                        </div>
+                        <input name="discountCode" type="text" placeholder="" />
+                        <Button type="submit" className="flex items-center gap-x-2">
+                            Use Code
+                        </Button>
+                    </div>
+                </form>
             </div>
             <Button disabled={items.length === 0} onClick={onCheckout} className="w-full mt-6">
                 Checkout

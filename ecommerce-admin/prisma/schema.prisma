@@ -19,6 +19,7 @@ model Store {
   sizes       Size[]        @relation("StoreToSize")
   colors      Color[]       @relation("StoreToColor")
   products    Product[]     @relation("StoreToProduct")
+  coupons     Coupon[]      @relation("StoreToCoupon")
   orders      Order[]       @relation("StoreToOrder")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -90,6 +91,16 @@ model Product {
   updatedAt   DateTime    @updatedAt
 }
 
+model Coupon {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  storeId     String      @db.ObjectId
+  store       Store       @relation("StoreToCoupon", fields: [storeId], references: [id])
+  name        String
+  value       Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
 model Image {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   productId   String      @db.ObjectId
@@ -104,6 +115,7 @@ model Order {
   storeId     String      @db.ObjectId
   store       Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems  OrderItem[]
+  discount    Int         @default(0)
   isPaid      Boolean     @default(false)
   phone       String      @default("")
   address     String      @default("")

@@ -17,7 +17,7 @@ export async function POST(
     req: Request,
     { params }: { params: { storeId:string } }
 ) {
-    const { products }: { products: Product[] } = await req.json();
+    const { products, discountCode }: { products: Product[], discountCode: string } = await req.json();
 
     if( !products || products.length === 0 ) {
         return new NextResponse("Product ids are required", { status: 400 });
@@ -25,6 +25,7 @@ export async function POST(
 
     console.log(products);
     console.log("Num: "+products.length);
+    console.log("Discount Code: "+discountCode);
     const ids = products.map((item: Product) => item.id);
 
     const product = await prismadb.product.findMany({
@@ -34,6 +35,15 @@ export async function POST(
             }
         }
     });
+
+    const coupon = await prismadb.coupon.findMany({
+        where: {
+            name: discountCode
+        }
+    });
+
+    var discount = 0;
+    if ( coupon && coupon.length>0 ) discount = coupon[0].value;
 
     product.forEach((item) => {
         const quantity = products.find((p: Product) => p.id === item.id)?.quantity || 0;
@@ -52,7 +62,7 @@ export async function POST(
                 product_data: {
                     name: item.name,
                 },
-                unit_amount: Math.round(parseFloat(item.price) * 100)
+                unit_amount: Math.round( parseFloat(item.price) * (100-discount) )
             }
         });
     });
@@ -63,6 +73,7 @@ export async function POST(
         data: {
             storeId: params.storeId,
             isPaid: false,
+            discount: discount,
             orderItems: {
                 create: products.map((item: Product) => ({
                     quantity: item.quantity,

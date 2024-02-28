@@ -6,6 +6,8 @@ import { Product } from "@/types";
 
 interface CartStore {
     items: Product[],
+    discount: string,
+    addDiscount: (data: string) => void,
     addItem: (data: Product) => void,
     removeItem: (id: string) => void,
     removeAll: () => void
@@ -14,6 +16,10 @@ interface CartStore {
 const useCart = create(
     persist<CartStore>((set, get) => ({
         items: [],
+        discount: "",
+        addDiscount: (data: string) => {
+            set({ discount: data });
+        },
         addItem: (data: Product) => {
             if( data == null ) return;
             toast.success("id: "+data.id);
@@ -32,7 +38,7 @@ const useCart = create(
             set({ items: [...get().items.filter((item) => item.id !== id)] });
             toast.success("Item removed from the cart.");
         },
-        removeAll: () => set({ items: [] })
+        removeAll: () => set({ items: [], discount: "" })
     }), {
         name: "cart-storage",
         storage: createJSONStorage(() => localStorage)
